@@ -25,11 +25,11 @@ export class StateStoreService {
 
     public initStateStore(config: StateConfig) {
         this.config =  config;
-        this.state.version = this.config.version;
+        this.config.initialState.version = this.config.version;
         this.loadFromStorage();
 
     }
-
+   
     public setValue(key: string, value: any, saveToStorage: boolean = true) {
   
           this.state[key] = value;
@@ -101,7 +101,7 @@ export class StateStoreService {
           return fromJS(this.state).toJS()[key];
       }
   
-      private getState():any {
+      public getState():any {
           return fromJS(this.state).toJS();
       }
       private loadFromStorage() {
@@ -119,9 +119,10 @@ export class StateStoreService {
           }
           
   
-          const state = savedState;
+          let state = savedState;
           if(state.version !== this.config.initialState.version) {
-            this.config.migrateFunction(this.config.initialState,state);
+            state =  this.config.migrateFunction(this.config.initialState, state);
+            state.version = this.config.initialState.version;
           }
 
           this.state = state;
@@ -146,7 +147,7 @@ export class StateStoreService {
     public stateChanged(key = null): Observable<any> {
         return this.dataChanged.pipe(
             filter(storeKey =>  !key || key == storeKey || storeKey == ''),
-            map((key) => key ? this.state[key] : this.state)
+            map(() => key ? this.state[key] : this.state)
         );
     }
   
@@ -158,7 +159,7 @@ export class StateStoreService {
 }
 
  const ServicesInjector: Injector = ReflectiveInjector.resolveAndCreate([StateStoreService]);
-export function getStateStoreService() {
+export function getStateStoreService(): StateStoreService {
     return ServicesInjector.get(StateStoreService);
 }
 export interface StateConfig {

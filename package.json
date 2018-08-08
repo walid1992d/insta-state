@@ -27,6 +27,7 @@
     "injection-js": "^2.2.1",
     "lzutf8": "^0.5.5",
     "reflect-metadata": "^0.1.12",
-    "rxjs": "^6.2.2"
+    "rxjs": "^6.2.2",
+    "stream": "0.0.2"
   }
 }
